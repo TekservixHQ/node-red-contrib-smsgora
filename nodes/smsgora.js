@@ -44,6 +44,13 @@ function toList(value) {
   return String(value).split(',').map((s) => s.trim()).filter(Boolean);
 }
 
+// JSON as PHP's json_encode writes it by default: "/" as "\/" and non-ASCII as \uXXXX.
+function phpJson(compact) {
+  return compact
+    .replace(/\//g, '\\/')
+    .replace(/[\u007f-￿]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+}
+
 /** Check the X-SmsGora-Signature header (sha256=<hex HMAC-SHA256 of the raw body>). */
 function verifyWebhook(rawBody, signature, secret) {
   if (!rawBody || !signature || !secret) return false;
@@ -144,11 +151,18 @@ module.exports = function (RED) {
       const secret = node.credentials && node.credentials.secret;
       const headers = (msg.req && msg.req.headers) || {};
       if (secret) {
-        // Best: the exact bytes received (msg.req.rawBody, see README). Fallbacks: a string/Buffer
-        // payload (http in with "Return: a UTF-8 string"), then the re-serialised JSON.
-        const raw = (msg.req && msg.req.rawBody) ||
-          (typeof msg.payload === 'string' || Buffer.isBuffer(msg.payload) ? msg.payload : JSON.stringify(msg.payload));
-        if (!verifyWebhook(raw, headers['x-smsgora-signature'], secret)) {
+        // Best: the exact bytes received (msg.req.rawBody, or a string/Buffer payload). When the
+        // http in node already parsed the JSON, try the two common ways it may have been encoded.
+        const signature = headers['x-smsgora-signature'];
+        const candidates = [];
+        if (msg.req && msg.req.rawBody) candidates.push(msg.req.rawBody);
+        if (typeof msg.payload === 'string' || Buffer.isBuffer(msg.payload)) {
+          candidates.push(msg.payload);
+        } else if (msg.payload && typeof msg.payload === 'object') {
+          const compact = JSON.stringify(msg.payload);
+          candidates.push(compact, phpJson(compact));
+        }
+        if (!candidates.some((raw) => verifyWebhook(raw, signature, secret))) {
           node.status({ fill: 'red', shape: 'ring', text: 'bad signature' });
           msg.statusCode = 401;
           send([null, msg]);

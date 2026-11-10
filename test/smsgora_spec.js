@@ -124,6 +124,29 @@ describe('smsgora nodes', function () {
     });
   });
 
+  it('webhook node accepts an already-parsed body signed PHP-style', function (done) {
+    const event = { event: 'sms.received', data: { from: '+1555', message: 'Café https://x.co/a' } };
+    const php = JSON.stringify(event).replace(/\//g, '\\/').replace(/é/g, '\\u00e9');
+    const sig = 'sha256=' + crypto.createHmac('sha256', 's3cret').update(php).digest('hex');
+    const f = [
+      { id: 'w1', type: 'smsgora-webhook', events: '', wires: [['ok'], ['rej']] },
+      { id: 'ok', type: 'helper' },
+      { id: 'rej', type: 'helper' },
+    ];
+    helper.load(smsgora, f, { w1: { secret: 's3cret' } }, function () {
+      helper.getNode('rej').on('input', () => done(new Error('should not be rejected')));
+      helper.getNode('ok').on('input', (msg) => {
+        try {
+          assert.strictEqual(msg.payload.data.message, 'Café https://x.co/a');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+      helper.getNode('w1').receive({ payload: event, req: { headers: { 'x-smsgora-signature': sig } } });
+    });
+  });
+
   it('verifyWebhook matches the reference vector', function () {
     const raw = '{"event":"sms.received","data":{"from":"+15551234567"}}';
     const sig = 'sha256=e125c07dfbecb498e8979383d7b9f0815efb128755409794b486d4bbb7199583';
