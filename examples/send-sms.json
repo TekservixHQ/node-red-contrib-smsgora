@@ -1,0 +1,9 @@
+[
+  {"id":"inj1","type":"inject","name":"Send test SMS","props":[{"p":"payload"},{"p":"to","v":"+15551234567","vt":"str"}],"payload":"Hello from Node-RED via SMS Gora","payloadType":"str","x":150,"y":80,"wires":[["send1"]]},
+  {"id":"send1","type":"smsgora-send","name":"","config":"","to":"","message":"","deviceId":"","simSlot":"","x":380,"y":80,"wires":[["dbg1"]]},
+  {"id":"dbg1","type":"debug","name":"result","active":true,"complete":"payload","x":580,"y":80,"wires":[]},
+  {"id":"http1","type":"http in","name":"SMS Gora webhook","url":"/smsgora","method":"post","x":150,"y":180,"wires":[["hook1"]]},
+  {"id":"hook1","type":"smsgora-webhook","name":"","events":"sms.received","x":380,"y":180,"wires":[["dbg2","resp1"],["resp1"]]},
+  {"id":"dbg2","type":"debug","name":"incoming SMS","active":true,"complete":"payload.data","x":600,"y":160,"wires":[]},
+  {"id":"resp1","type":"http response","name":"","statusCode":"","x":590,"y":220,"wires":[]}
+]

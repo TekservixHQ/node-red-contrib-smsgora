@@ -1,0 +1,209 @@
+<!-- SMS Gora config -->
+<script type="text/javascript">
+  RED.nodes.registerType('smsgora-config', {
+    category: 'config',
+    defaults: {
+      name: { value: '' },
+      baseUrl: { value: 'https://tekservix.com/smsgora/api/v1', required: true },
+    },
+    credentials: { apiKey: { type: 'password', required: true } },
+    label: function () {
+      return this.name || 'SMS Gora';
+    },
+  });
+</script>
+<script type="text/html" data-template-name="smsgora-config">
+  <div class="form-row">
+    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-config-input-name" placeholder="SMS Gora" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-apiKey"><i class="fa fa-key"></i> API key</label>
+    <input type="password" id="node-config-input-apiKey" placeholder="sgk_..." />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-baseUrl"><i class="fa fa-globe"></i> Base URL</label>
+    <input type="text" id="node-config-input-baseUrl" />
+  </div>
+</script>
+<script type="text/html" data-help-name="smsgora-config">
+  <p>Your SMS Gora account. Create an API key in the SMS Gora dashboard under <b>SMS Gora → API keys</b> (it starts with <code>sgk_</code>). Leave the base URL as it is.</p>
+</script>
+
+<!-- SMS Gora send -->
+<script type="text/javascript">
+  RED.nodes.registerType('smsgora-send', {
+    category: 'network',
+    color: '#93C5FD',
+    defaults: {
+      name: { value: '' },
+      config: { type: 'smsgora-config', required: true },
+      to: { value: '' },
+      message: { value: '' },
+      deviceId: { value: '' },
+      simSlot: { value: '' },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: 'smsgora.svg',
+    align: 'right',
+    paletteLabel: 'sms gora send',
+    label: function () {
+      return this.name || 'SMS Gora send';
+    },
+  });
+</script>
+<script type="text/html" data-template-name="smsgora-send">
+  <div class="form-row">
+    <label for="node-input-config"><i class="fa fa-user"></i> Account</label>
+    <input type="text" id="node-input-config" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-to"><i class="fa fa-phone"></i> To</label>
+    <input type="text" id="node-input-to" placeholder="+15551234567, +447700900123" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-message"><i class="fa fa-comment"></i> Message</label>
+    <input type="text" id="node-input-message" placeholder="Used when msg.payload is empty" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-deviceId"><i class="fa fa-mobile"></i> Phone ID</label>
+    <input type="text" id="node-input-deviceId" placeholder="Optional: best online phone if empty" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-simSlot"><i class="fa fa-sim-card"></i> SIM</label>
+    <select id="node-input-simSlot">
+      <option value="">Default</option>
+      <option value="0">SIM 1</option>
+      <option value="1">SIM 2</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" />
+  </div>
+</script>
+<script type="text/html" data-help-name="smsgora-send">
+  <p>Sends an SMS through your own Android phones with <a href="https://tekservix.com/smsgora/" target="_blank">SMS Gora</a>.</p>
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">string</span></dt>
+    <dd>The text to send. If empty, the node's <i>Message</i> is used.</dd>
+    <dt class="optional">to <span class="property-type">string | array</span></dt>
+    <dd>One or more numbers in international format (comma separated or an array, up to 1,000). Overrides <i>To</i>.</dd>
+    <dt class="optional">deviceId <span class="property-type">number</span></dt>
+    <dd>Send from this phone.</dd>
+    <dt class="optional">simSlot <span class="property-type">number</span></dt>
+    <dd>0 = SIM 1, 1 = SIM 2.</dd>
+    <dt class="optional">scheduleAt <span class="property-type">string | Date</span></dt>
+    <dd>Send later.</dd>
+  </dl>
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload <span class="property-type">object</span></dt>
+    <dd><code>{ message_ids: [...] }</code>, one ID per recipient. Check delivery with the <i>sms gora api</i> node (<code>GET /messages/&lt;id&gt;</code>).</dd>
+  </dl>
+  <p>Errors can be caught with a <i>catch</i> node; <code>msg.error</code> holds <code>status</code>, <code>message</code>, <code>errors</code> and <code>retryAfter</code>.</p>
+</script>
+
+<!-- SMS Gora API -->
+<script type="text/javascript">
+  RED.nodes.registerType('smsgora-api', {
+    category: 'network',
+    color: '#93C5FD',
+    defaults: {
+      name: { value: '' },
+      config: { type: 'smsgora-config', required: true },
+      method: { value: 'GET' },
+      path: { value: '/account', required: true },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: 'smsgora.svg',
+    paletteLabel: 'sms gora api',
+    label: function () {
+      return this.name || this.method + ' ' + this.path;
+    },
+  });
+</script>
+<script type="text/html" data-template-name="smsgora-api">
+  <div class="form-row">
+    <label for="node-input-config"><i class="fa fa-user"></i> Account</label>
+    <input type="text" id="node-input-config" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-method"><i class="fa fa-exchange"></i> Method</label>
+    <select id="node-input-method">
+      <option>GET</option>
+      <option>POST</option>
+      <option>PUT</option>
+      <option>DELETE</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-path"><i class="fa fa-link"></i> Path</label>
+    <input type="text" id="node-input-path" placeholder="/devices" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" />
+  </div>
+</script>
+<script type="text/html" data-help-name="smsgora-api">
+  <p>Calls any endpoint of the <a href="https://tekservix.com/smsgora/docs/" target="_blank">SMS Gora API</a> and returns its <code>data</code>.</p>
+  <p>Examples: <code>GET /devices</code>, <code>GET /messages/1873</code>, <code>POST /messages/1873/cancel</code>, <code>GET /received-sms?limit=50</code>, <code>GET /account</code>.</p>
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt class="optional">method <span class="property-type">string</span></dt>
+    <dd>Overrides the method.</dd>
+    <dt class="optional">path <span class="property-type">string</span></dt>
+    <dd>Overrides the path.</dd>
+    <dt class="optional">payload <span class="property-type">object</span></dt>
+    <dd>JSON body for POST and PUT.</dd>
+  </dl>
+</script>
+
+<!-- SMS Gora webhook -->
+<script type="text/javascript">
+  RED.nodes.registerType('smsgora-webhook', {
+    category: 'network',
+    color: '#93C5FD',
+    defaults: {
+      name: { value: '' },
+      events: { value: 'sms.received' },
+    },
+    credentials: { secret: { type: 'password' } },
+    inputs: 1,
+    outputs: 2,
+    outputLabels: ['event', 'reply (send to http response)'],
+    icon: 'smsgora.svg',
+    paletteLabel: 'sms gora webhook',
+    label: function () {
+      return this.name || 'SMS Gora webhook';
+    },
+  });
+</script>
+<script type="text/html" data-template-name="smsgora-webhook">
+  <div class="form-row">
+    <label for="node-input-secret"><i class="fa fa-lock"></i> Secret</label>
+    <input type="password" id="node-input-secret" placeholder="Webhook secret from SMS Gora" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-events"><i class="fa fa-filter"></i> Events</label>
+    <input type="text" id="node-input-events" placeholder="sms.received, sms.delivered (empty = all)" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" />
+  </div>
+</script>
+<script type="text/html" data-help-name="smsgora-webhook">
+  <p>Receives SMS Gora webhooks: incoming SMS and sent, delivered or failed reports.</p>
+  <p>Wire it as <i>http in</i> (POST) → <b>sms gora webhook</b> → your flow, and connect output 2 (and the end of your flow) to an <i>http response</i> node. Add your Node-RED URL in SMS Gora → Webhooks and paste the secret here.</p>
+  <h3>Outputs</h3>
+  <ol class="node-ports">
+    <li>Event: <code>msg.payload</code> is the event, <code>msg.topic</code> its name (e.g. <code>sms.received</code>). <code>msg.payload.data.from</code> and <code>msg.payload.data.message</code> hold the SMS.</li>
+    <li>Rejected or filtered requests, with <code>msg.statusCode</code> (401 or 200) for an http response node.</li>
+  </ol>
+  <p>The signature is an HMAC of the raw body. For an exact check, keep the raw body (see the package README); otherwise the parsed JSON is re-serialised.</p>
+</script>

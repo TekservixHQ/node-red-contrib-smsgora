@@ -1,0 +1,51 @@
+{
+  "name": "node-red-contrib-smsgora",
+  "version": "1.0.0",
+  "description": "Node-RED nodes for SMS Gora: send and receive SMS through your own Android phones, with delivery reports and signed webhooks.",
+  "license": "MIT",
+  "author": "Tekservix <support@tekservix.com>",
+  "homepage": "https://tekservix.com/smsgora/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TekservixHQ/node-red-contrib-smsgora.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TekservixHQ/node-red-contrib-smsgora/issues"
+  },
+  "keywords": [
+    "node-red",
+    "sms",
+    "sms-gateway",
+    "bulk-sms",
+    "android",
+    "otp",
+    "smsgora",
+    "tekservix"
+  ],
+  "files": [
+    "nodes",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "node-red": {
+    "version": ">=3.0.0",
+    "nodes": {
+      "smsgora": "nodes/smsgora.js"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "mocha test/*_spec.js --exit"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.0",
+    "node-red": "^4.0.0",
+    "node-red-node-test-helper": "^0.3.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
