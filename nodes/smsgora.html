@@ -205,5 +205,5 @@
     <li>Event: <code>msg.payload</code> is the event, <code>msg.topic</code> its name (e.g. <code>sms.received</code>). <code>msg.payload.data.from</code> and <code>msg.payload.data.message</code> hold the SMS.</li>
     <li>Rejected or filtered requests, with <code>msg.statusCode</code> (401 or 200) for an http response node.</li>
   </ol>
-  <p>The signature is an HMAC of the raw body. For an exact check, keep the raw body (see the package README); otherwise the parsed JSON is re-serialised.</p>
+  <p>Every request is checked against its <code>X-SmsGora-Signature</code> (HMAC-SHA256). Requests that do not match go to output 2 with status 401.</p>
 </script>
