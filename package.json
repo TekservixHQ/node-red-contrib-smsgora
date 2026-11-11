@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-smsgora",
-  "version": "1.0.0",
-  "description": "Node-RED nodes for SMS Gora: send and receive SMS through your own Android phones, with delivery reports and signed webhooks.",
+  "version": "1.0.1",
+  "description": "SMS Gora SMS Gateway: Node-RED nodes by Tekservix. Send and receive SMS through your own Android phones, with delivery reports and signed webhooks.",
   "license": "MIT",
   "author": "Tekservix <support@tekservix.com>",
   "homepage": "https://tekservix.com/smsgora/",
@@ -14,6 +14,7 @@
   },
   "keywords": [
     "node-red",
+    "sms-api-gateway",
     "sms",
     "sms-gateway",
     "bulk-sms",
