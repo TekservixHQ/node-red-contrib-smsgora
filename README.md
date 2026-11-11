@@ -3,6 +3,8 @@
 [![npm](https://img.shields.io/npm/v/node-red-contrib-smsgora.svg)](https://www.npmjs.com/package/node-red-contrib-smsgora)
 [![tests](https://github.com/TekservixHQ/node-red-contrib-smsgora/actions/workflows/tests.yml/badge.svg)](https://github.com/TekservixHQ/node-red-contrib-smsgora/actions/workflows/tests.yml)
 
+**SMS Gora SMS Gateway** - official Node-RED nodes: send and receive SMS through your own Android phones, delivery reports and signed webhooks.
+
 Node-RED nodes for [SMS Gora](https://tekservix.com/smsgora/), the SMS gateway that sends and receives texts through your own Android phones.
 
 Send SMS from any flow (alerts from sensors, Home Assistant, PLCs, servers, forms) and react to incoming SMS and delivery reports. There's no sender ID registration and no per-message fee from us: your mobile operator bills the texts like any SMS.
